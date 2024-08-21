@@ -2,50 +2,57 @@ services:
   mariadb_apo:
     container_name: mariadb_apo
     image: mariadb
-    env_file: .env    
+    env_file: 
+      - .env    
     restart: always
     volumes:
       - /Users/apolinav/mariadb_data:/var/lib/mysql
-      - type: bind
-        source: ./.env
-        target: /envfile/.env
     environment:
-      MARIADB_USER: $MARIADB_USER
-      MARIADB_ROOT_PASSWORD: $MARIADB_PASSWORD
-      MARIADB_DATABASE: $DB_DATABASE
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE}
     ports:
-      - "$DOCKER_PORT:$DB_PORT"
+      - ${DOCKER_PORT}:${DB_PORT}
     networks:
       - apo_red
 
-  backend-services:
-    build: .
-    env_file: .env
+  backend-apo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/usr/src/app
+    env_file: 
+      - .env
     depends_on:
       - mariadb_apo
     links:
       - mariadb_apo
-    volumes:
-      - /Users/apolinav/data/data_node:/src/
     environment:
-      ENVIRONMENT_SERVER: "test"
-      SERVER_PORT: 3010
-      REPARTICION_SERVER: "APOLINAV"
-      VERSION_SERVER: "1.0.0"
-      ANO_SERVER: "2024"
-      CREADOR_SERVER: "JUAN S. DELGADILLO"
-      DB_HOST: "mariadb_apo"
-      DB_PORT: 3306
-      DB_DATABASE: "appolinav"
-      DB_USER: "root"
-      DB_PASSWORD: $MARIADB_PASSWORD 
+      ENVIRONMENT_SERVER: ${ENVIRONMENT_SERVER}
+      SERVER_PORT: ${APP_PORT_NEST}
+      REPARTICION_SERVER: ${REPARTICION_SERVER}
+      VERSION_SERVER: ${VERSION_SERVER}
+      ANO_SERVER: ${ANO_SERVER}
+      CREADOR_SERVER: ${CREADOR_SERVER}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD} 
     ports:
     - '3010:3010'
-    container_name: backend-service
+    container_name: backend-apo
     restart: always
     networks:
       - apo_red
 
 networks:
   apo_red:
+
+volumes:
+  mariadb_apo:
+  backend-apo:
+    
+
   

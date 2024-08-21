@@ -1,15 +1,15 @@
 FROM node:20-alpine3.20
 
-WORKDIR /usr/app
+WORKDIR /usr/src/app
 
-COPY package.json .
+COPY package*.json ./
 
 RUN npm install
 
 COPY . .
 
-COPY .env /app/
-
 EXPOSE 3010
 
-CMD npm start
+RUN npm run build
+
+CMD [ "npm", "run", "start:dev" ]
